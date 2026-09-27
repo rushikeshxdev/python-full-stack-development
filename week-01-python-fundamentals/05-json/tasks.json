@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "title": "Learn Python",
+        "status": "completed"
+    },
+    {
+        "id": 2,
+        "title": "Learn JSON",
+        "status": "pending"
+    },
+    {
+        "id": 3,
+        "title": "Build CRUD",
+        "status": "pending"
+    },
+    {
+        "id": 4,
+        "title": "Learn Flask",
+        "status": "pending"
+    }
+]
