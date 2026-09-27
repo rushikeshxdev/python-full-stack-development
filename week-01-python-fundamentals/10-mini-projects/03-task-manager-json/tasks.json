@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "title": "Learn Python",
+        "description": "Complete Week 1 Python training",
+        "status": "completed"
+    },
+    {
+        "id": 2,
+        "title": "Build CRUD",
+        "description": "Complete JSON Task Manager",
+        "status": "pending"
+    }
+]
