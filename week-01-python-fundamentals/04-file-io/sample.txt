@@ -1,0 +1,3 @@
+Hello, I am Rushikesh.
+I am learning Python File I/O.
+I am preparing for backend development.

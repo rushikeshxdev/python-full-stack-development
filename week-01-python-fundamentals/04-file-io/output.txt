@@ -1,0 +1,5 @@
+Hello, Rushikesh!
+I am learning Python File I/O.
+This file was created using Python.
+This line was added later.
+This is an example of append mode.
