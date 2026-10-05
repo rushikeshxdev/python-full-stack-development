@@ -17,3 +17,7 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Database
+*.sqlite3
+db.sqlite3
