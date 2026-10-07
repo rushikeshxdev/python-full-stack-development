@@ -47,3 +47,24 @@ class TaskAPITestCase(TestCase):
         response = self.client.get('/api/v1/tasks/metrics/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['total'], 1)
+
+    def test_request_logging_middleware_header(self):
+        response = self.client.get('/api/v1/tasks/')
+        self.assertIn('X-Request-ID', response.headers)
+        self.assertEqual(len(response.headers['X-Request-ID']), 8)
+
+    def test_create_task_validation_error(self):
+        payload = {"title": "a"}
+        response = self.client.post('/api/v1/tasks/', payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(response.data['success'])
+        self.assertEqual(response.data['error']['code'], 'ValidationError')
+        self.assertIn('title', response.data['error']['details'])
+        self.assertIn('request_id', response.data)
+
+    def test_not_found_standardized_error(self):
+        response = self.client.get('/api/v1/tasks/99999/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(response.data['success'])
+        self.assertEqual(response.data['error']['code'], 'Http404')
+        self.assertIn('request_id', response.data)
