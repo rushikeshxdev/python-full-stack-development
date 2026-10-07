@@ -17,13 +17,11 @@ class TaskAPITestCase(TestCase):
         )
 
     def test_list_tasks_v1(self):
-        """Verify GET /api/v1/tasks/ returns 200 and list results."""
         response = self.client.get('/api/v1/tasks/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(response.data['results']), 1)
 
     def test_create_task_v1(self):
-        """Verify POST /api/v1/tasks/ creates a task and returns 201."""
         payload = {
             "title": "New Generic View Task",
             "description": "Created via v1 API",
@@ -35,7 +33,6 @@ class TaskAPITestCase(TestCase):
         self.assertEqual(response.data['title'], "New Generic View Task")
 
     def test_task_detail_patch_v1(self):
-        """Verify PATCH /api/v1/tasks/<id>/ partially updates the task."""
         payload = {"status": TaskStatus.DONE}
         response = self.client.patch(f'/api/v1/tasks/{self.task1.id}/', payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -43,7 +40,6 @@ class TaskAPITestCase(TestCase):
         self.assertEqual(self.task1.status, TaskStatus.DONE)
 
     def test_task_metrics_service_and_endpoint(self):
-        """Verify reusable service function and /api/v1/tasks/metrics/ endpoint."""
         metrics = get_task_metrics()
         self.assertEqual(metrics['total'], 1)
         self.assertEqual(metrics['todo'], 1)

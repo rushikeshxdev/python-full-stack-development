@@ -612,7 +612,6 @@
       fetchTasks();
     });
 
-    // 1. GET: Fetch tasks from API
     async function fetchTasks() {
       let url = `${API_BASE}?ordering=-created_at`;
       if (activeStatus) url += `&status=${activeStatus}`;
@@ -630,7 +629,6 @@
       }
     }
 
-    // 2. Update Global Counters via backend Service Metrics endpoint
     async function updateCounters() {
       try {
         const res = await fetch(`${API_BASE}metrics/`);
@@ -642,7 +640,6 @@
       } catch (e) {}
     }
 
-    // 3. Render DOM
     function renderList(tasks) {
       const container = document.getElementById('task-list');
 
@@ -683,7 +680,6 @@
             <div class="task-actions">
               <span class="badge badge-${task.priority}">${task.priority}</span>
               
-              <!-- Inline Status Change -->
               <select class="status-select" onchange="changeStatus(${task.id}, this.value)">
                 <option value="TODO" ${task.status === 'TODO' ? 'selected' : ''}>To Do</option>
                 <option value="IN_PROGRESS" ${task.status === 'IN_PROGRESS' ? 'selected' : ''}>In Progress</option>
@@ -698,7 +694,6 @@
       }).join('');
     }
 
-    // 4. POST: Create Task
     async function createTask(e) {
       e.preventDefault();
       const title = document.getElementById('new-title').value.trim();
@@ -727,7 +722,6 @@
           document.getElementById('new-desc').value = '';
           document.getElementById('new-due-date').value = '';
 
-          // If the created task status is different from current active tab, switch tab
           if (activeStatus && activeStatus !== status) {
             const matchingTab = document.querySelector(`.tab[data-status="${status}"]`);
             if (matchingTab) switchTab(matchingTab, status);
@@ -740,18 +734,15 @@
       }
     }
 
-    // 5. PATCH: Toggle Done / Todo
     async function toggleDone(id, currentStatus) {
       const nextStatus = currentStatus === 'DONE' ? 'TODO' : 'DONE';
       await patchTask(id, { status: nextStatus });
     }
 
-    // 6. PATCH: Change Status from Dropdown
     async function changeStatus(id, newStatus) {
       await patchTask(id, { status: newStatus });
     }
 
-    // 7. Generic PATCH
     async function patchTask(id, bodyObj) {
       try {
         const res = await fetch(`${API_BASE}${id}/`, {
@@ -765,7 +756,6 @@
       }
     }
 
-    // 8. DELETE: Delete Task
     async function deleteTask(id) {
       if (!confirm(`Delete task #${id}?`)) return;
       try {
@@ -776,7 +766,6 @@
       }
     }
 
-    // 9. Edit Modal
     function openEditModal(id) {
       const task = cachedTasks.find(t => t.id === id);
       if (!task) return;
@@ -822,7 +811,6 @@
       }
     }
 
-    // Filter Tabs
     function switchTab(btn, status) {
       activeStatus = status;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -830,7 +818,6 @@
       fetchTasks();
     }
 
-    // Search with 250ms Debounce
     function searchTasks(val) {
       clearTimeout(searchDebounce);
       searchDebounce = setTimeout(() => {
