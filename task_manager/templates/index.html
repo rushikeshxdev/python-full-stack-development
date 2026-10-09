@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +25,11 @@
       --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: var(--font);
@@ -111,7 +116,9 @@
     }
 
     @media (max-width: 680px) {
-      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     .metric-card {
@@ -166,13 +173,16 @@
     }
 
     @media (max-width: 768px) {
-      .form-row { grid-template-columns: 1fr; }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
     }
 
     .field {
       display: flex;
       flex-direction: column;
       gap: 4px;
+      width: 100%;
     }
 
     .field-desc {
@@ -186,7 +196,10 @@
       color: var(--text-muted);
     }
 
-    input, select, textarea {
+    input:not([type="checkbox"]),
+    select,
+    textarea {
+      width: 100%;
       background: #0d1117;
       border: 1px solid var(--card-border);
       color: var(--text-bright);
@@ -197,7 +210,9 @@
       outline: none;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
       border-color: #58a6ff;
     }
 
@@ -246,7 +261,9 @@
       border-right: 1px solid var(--card-border);
     }
 
-    .tab:last-child { border-right: none; }
+    .tab:last-child {
+      border-right: none;
+    }
 
     .tab.active {
       background: #30363d;
@@ -350,9 +367,81 @@
       text-transform: uppercase;
     }
 
-    .badge-HIGH { background: rgba(248, 81, 73, 0.15); border-color: rgba(248, 81, 73, 0.4); color: var(--red); }
-    .badge-MEDIUM { background: rgba(210, 153, 34, 0.15); border-color: rgba(210, 153, 34, 0.4); color: var(--amber); }
-    .badge-LOW { background: rgba(88, 166, 255, 0.15); border-color: rgba(88, 166, 255, 0.4); color: var(--blue); }
+    .badge-HIGH {
+      background: rgba(248, 81, 73, 0.15);
+      border-color: rgba(248, 81, 73, 0.4);
+      color: var(--red);
+    }
+
+    .badge-MEDIUM {
+      background: rgba(210, 153, 34, 0.15);
+      border-color: rgba(210, 153, 34, 0.4);
+      color: var(--amber);
+    }
+
+    .badge-LOW {
+      background: rgba(88, 166, 255, 0.15);
+      border-color: rgba(88, 166, 255, 0.4);
+      color: var(--blue);
+    }
+
+    .project-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--blue);
+      background: rgba(88, 166, 255, 0.12);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .tags-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .tag-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--purple);
+      background: rgba(188, 140, 255, 0.12);
+      border: 1px solid rgba(188, 140, 255, 0.3);
+      padding: 1px 7px;
+      border-radius: 10px;
+    }
+
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      background: #21262d;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      border-radius: 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .tag-chip:hover {
+      border-color: var(--purple);
+      color: var(--text-bright);
+    }
+
+    .tag-chip.active {
+      background: rgba(188, 140, 255, 0.2);
+      border-color: var(--purple);
+      color: #d2a8ff;
+      font-weight: 600;
+    }
 
     .status-select {
       background: #21262d;
@@ -404,7 +493,9 @@
       justify-content: center;
     }
 
-    .modal-backdrop.open { display: flex; }
+    .modal-backdrop.open {
+      display: flex;
+    }
 
     .modal {
       background: var(--card-bg);
@@ -448,6 +539,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- Top Nav -->
@@ -458,8 +550,21 @@
     </div>
     <div class="nav-links">
       <a href="/api/docs/" target="_blank" class="nav-link highlight">📄 Swagger UI</a>
-      <a href="/api/tasks/" target="_blank" class="nav-link">⚡ Raw API</a>
+      <a href="/api/v1/tasks/" target="_blank" class="nav-link">⚡ Raw API</a>
       <a href="/admin/" target="_blank" class="nav-link">⚙️ Admin</a>
+
+      <div id="auth-logged-out" style="display: flex; gap: 8px;">
+        <button type="button" class="nav-link" onclick="openAuthModal('login')" style="cursor: pointer;">
+          🔑 Sign In
+        </button>
+        <button type="button" class="nav-link highlight" onclick="openAuthModal('register')" style="cursor: pointer;">
+          ✨ Sign Up
+        </button>
+      </div>
+      <div id="auth-logged-in" style="display: none; align-items: center; gap: 8px;">
+        <span id="nav-user-badge" style="font-size: 0.85rem; color: var(--blue);"></span>
+        <button type="button" class="nav-link" onclick="logout()" style="cursor: pointer;">🚪 Logout</button>
+      </div>
     </div>
   </nav>
 
@@ -492,10 +597,19 @@
       </div>
       <div class="panel-body">
         <form id="create-form" onsubmit="createTask(event)">
-          <div class="form-row">
+          <div style="display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr auto; gap: 10px; align-items: end;">
             <div class="field">
               <label for="new-title">Title *</label>
               <input type="text" id="new-title" placeholder="e.g. Implement PostgreSQL schema" required>
+            </div>
+            <div class="field">
+              <label for="new-project" style="display: flex; justify-content: space-between;">
+                <span>Project</span>
+                <a href="javascript:void(0)" onclick="promptNewProject()" style="color: var(--blue); text-decoration: none; font-size: 0.72rem;">+ New</a>
+              </label>
+              <select id="new-project">
+                <option value="">-- No Project --</option>
+              </select>
             </div>
             <div class="field">
               <label for="new-status">Status</label>
@@ -513,15 +627,26 @@
                 <option value="HIGH">High</option>
               </select>
             </div>
+            <button type="submit" class="btn-primary" style="height: 35px;">+ Add Task</button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.5fr 1fr 2fr; gap: 10px; margin-top: 10px; align-items: start;">
+            <div class="field">
+              <label for="new-desc">Description (optional)</label>
+              <input type="text" id="new-desc" placeholder="Details about this task...">
+            </div>
             <div class="field">
               <label for="new-due-date">Due Date</label>
               <input type="date" id="new-due-date">
             </div>
-            <button type="submit" class="btn-primary">+ Add Task</button>
-
-            <div class="field field-desc">
-              <label for="new-desc">Description (optional)</label>
-              <input type="text" id="new-desc" placeholder="Details about this task...">
+            <div class="field">
+              <label style="display: flex; justify-content: space-between;">
+                <span>Tags</span>
+                <a href="javascript:void(0)" onclick="promptNewTag()" style="color: var(--purple); text-decoration: none; font-size: 0.72rem;">+ New Tag</a>
+              </label>
+              <div id="new-tags-container" class="tags-wrapper" style="min-height: 32px;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">No tags available</span>
+              </div>
             </div>
           </div>
         </form>
@@ -537,12 +662,8 @@
         <button class="tab" data-status="DONE" onclick="switchTab(this, 'DONE')">Done</button>
       </div>
 
-      <input 
-        type="text" 
-        class="search-input" 
-        placeholder="Search tasks by title or description..." 
-        oninput="searchTasks(this.value)"
-      >
+      <input type="text" class="search-input" placeholder="Search tasks by title or description..."
+        oninput="searchTasks(this.value)">
     </div>
 
     <!-- Task Items List -->
@@ -557,7 +678,8 @@
     <div class="modal">
       <div class="modal-header">
         <span>Edit Task #<span id="edit-id-label"></span></span>
-        <button onclick="closeEditModal()" style="background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;">&times;</button>
+        <button onclick="closeEditModal()"
+          style="background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;">&times;</button>
       </div>
       <form id="edit-form" onsubmit="saveEdit(event)">
         <input type="hidden" id="edit-id">
@@ -588,9 +710,21 @@
               </select>
             </div>
           </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="field">
+              <label for="edit-due-date">Due Date</label>
+              <input type="date" id="edit-due-date">
+            </div>
+            <div class="field">
+              <label for="edit-project">Project</label>
+              <select id="edit-project">
+                <option value="">-- No Project --</option>
+              </select>
+            </div>
+          </div>
           <div class="field">
-            <label for="edit-due-date">Due Date</label>
-            <input type="date" id="edit-due-date">
+            <label>Tags</label>
+            <div id="edit-tags-container" class="tags-wrapper" style="min-height: 32px;"></div>
           </div>
         </div>
         <div class="modal-footer">
@@ -601,24 +735,434 @@
     </div>
   </div>
 
+  <!-- Auth Modal (Sign In & Sign Up) -->
+  <div class="modal-backdrop" id="auth-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="auth-modal-title">Sign In to Task Manager</span>
+        <button type="button" onclick="closeAuthModal()" style="background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;">&times;</button>
+      </div>
+      <form onsubmit="submitAuth(event)">
+        <div class="modal-body">
+          <div class="field">
+            <label for="auth-username">Username</label>
+            <input type="text" id="auth-username" required placeholder="e.g. rushi" autocomplete="username">
+          </div>
+          <div class="field" id="auth-email-group" style="display: none;">
+            <label for="auth-email">Email Address</label>
+            <input type="email" id="auth-email" placeholder="name@example.com" autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="auth-password">Password</label>
+            <input type="password" id="auth-password" required placeholder="••••••••" autocomplete="current-password">
+            <small id="auth-password-hint" style="display: none; color: var(--text-muted); font-size: 0.75rem; margin-top: 4px;">
+              Minimum 8 characters
+            </small>
+          </div>
+          <div id="auth-error-msg" style="color: var(--red); font-size: 0.85rem; display: none;"></div>
+          <div id="auth-success-msg" style="color: var(--primary); font-size: 0.85rem; display: none;"></div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 0.85rem; color: var(--text-muted);">
+            <span id="auth-toggle-prompt">Don't have an account?</span>
+            <a href="javascript:void(0)" id="auth-toggle-btn" onclick="toggleAuthMode()" style="color: var(--blue); text-decoration: none; margin-left: 4px; font-weight: 500;">Sign Up</a>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn-secondary" onclick="closeAuthModal()">Cancel</button>
+            <button type="submit" class="btn-primary" id="auth-submit-btn">Sign In</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     const API_BASE = '/api/v1/tasks/';
+    const API_PROJECTS = '/api/v1/projects/';
+    const API_TAGS = '/api/v1/tags/';
+    const AUTH_LOGIN_URL = '/api/v1/auth/login/';
+    const AUTH_REGISTER_URL = '/api/v1/auth/register/';
+    let currentAuthMode = 'login'; // 'login' or 'register'
     let activeStatus = '';
     let searchQuery = '';
     let searchDebounce = null;
     let cachedTasks = [];
+    let cachedProjects = [];
+    let cachedTags = [];
+    let selectedNewTags = new Set();
+    let selectedEditTags = new Set();
 
     document.addEventListener('DOMContentLoaded', () => {
-      fetchTasks();
+      updateAuthUI();
+      if (localStorage.getItem('access_token')) {
+        fetchTasks();
+        fetchProjects();
+        fetchTags();
+      } else {
+        renderList([]);
+      }
     });
 
+    // Centralized authenticated fetch helper
+    async function authFetch(url, options = {}) {
+      const token = localStorage.getItem('access_token');
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(url, { ...options, headers });
+
+      if (res.status === 401) {
+        handleUnauthorized();
+      }
+      return res;
+    }
+
+    function handleUnauthorized() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('username');
+      updateAuthUI();
+      renderList([]);
+      updateCounters();
+      openAuthModal('login');
+    }
+
+    function openAuthModal(mode = 'login') {
+      currentAuthMode = mode;
+      updateAuthModalMode();
+      document.getElementById('auth-modal').classList.add('open');
+      document.getElementById('auth-error-msg').style.display = 'none';
+      document.getElementById('auth-success-msg').style.display = 'none';
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.remove('open');
+    }
+
+    // Aliases for compatibility
+    function openLoginModal() { openAuthModal('login'); }
+    function closeLoginModal() { closeAuthModal(); }
+
+    function toggleAuthMode() {
+      currentAuthMode = currentAuthMode === 'login' ? 'register' : 'login';
+      updateAuthModalMode();
+    }
+
+    function updateAuthModalMode() {
+      const isRegister = currentAuthMode === 'register';
+      document.getElementById('auth-modal-title').textContent = isRegister ? 'Create an Account' : 'Sign In to Task Manager';
+      document.getElementById('auth-email-group').style.display = isRegister ? 'flex' : 'none';
+      document.getElementById('auth-password-hint').style.display = isRegister ? 'block' : 'none';
+      document.getElementById('auth-submit-btn').textContent = isRegister ? 'Create Account' : 'Sign In';
+      document.getElementById('auth-toggle-prompt').textContent = isRegister ? 'Already have an account?' : "Don't have an account?";
+      document.getElementById('auth-toggle-btn').textContent = isRegister ? 'Sign In' : 'Sign Up';
+      document.getElementById('auth-error-msg').style.display = 'none';
+      document.getElementById('auth-success-msg').style.display = 'none';
+    }
+
+    async function submitAuth(e) {
+      e.preventDefault();
+      const username = document.getElementById('auth-username').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const email = document.getElementById('auth-email').value.trim();
+      const errorEl = document.getElementById('auth-error-msg');
+      const successEl = document.getElementById('auth-success-msg');
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+
+      if (currentAuthMode === 'register') {
+        if (password.length < 8) {
+          errorEl.textContent = 'Password must be at least 8 characters long.';
+          errorEl.style.display = 'block';
+          return;
+        }
+
+        try {
+          const regRes = await fetch(AUTH_REGISTER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+          });
+
+          const regData = await regRes.json();
+
+          if (!regRes.ok) {
+            let errMsg = 'Registration failed.';
+            if (regData.error?.details) {
+              const d = regData.error.details;
+              if (typeof d === 'string') errMsg = d;
+              else if (typeof d === 'object') {
+                errMsg = Object.entries(d).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(' ') : v}`).join(' | ');
+              }
+            } else if (regData.detail) {
+              errMsg = regData.detail;
+            }
+            errorEl.textContent = errMsg;
+            errorEl.style.display = 'block';
+            return;
+          }
+
+          // Registration succeeded! Automatically log the user in immediately:
+          const loginRes = await fetch(AUTH_LOGIN_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+
+          const loginData = await loginRes.json();
+
+          if (loginRes.ok) {
+            localStorage.setItem('access_token', loginData.access);
+            localStorage.setItem('refresh_token', loginData.refresh);
+            localStorage.setItem('username', username);
+            document.getElementById('auth-username').value = '';
+            document.getElementById('auth-email').value = '';
+            document.getElementById('auth-password').value = '';
+            closeAuthModal();
+            updateAuthUI();
+            fetchTasks();
+            fetchProjects();
+            fetchTags();
+          } else {
+            openAuthModal('login');
+            successEl.textContent = 'Account created successfully! Please sign in.';
+            successEl.style.display = 'block';
+          }
+        } catch (err) {
+          errorEl.textContent = 'Server error during registration.';
+          errorEl.style.display = 'block';
+        }
+      } else {
+        // Sign In
+        try {
+          const res = await fetch(AUTH_LOGIN_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            localStorage.setItem('access_token', data.access);
+            localStorage.setItem('refresh_token', data.refresh);
+            localStorage.setItem('username', username);
+            document.getElementById('auth-username').value = '';
+            document.getElementById('auth-password').value = '';
+            closeAuthModal();
+            updateAuthUI();
+            fetchTasks();
+            fetchProjects();
+            fetchTags();
+          } else {
+            const errMsg = data.error?.details?.detail || data.detail || 'Invalid username or password.';
+            errorEl.textContent = errMsg;
+            errorEl.style.display = 'block';
+          }
+        } catch (err) {
+          errorEl.textContent = 'Server error during login.';
+          errorEl.style.display = 'block';
+        }
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('username');
+      updateAuthUI();
+      renderList([]);
+      cachedProjects = [];
+      cachedTags = [];
+      selectedNewTags.clear();
+      selectedEditTags.clear();
+      renderProjectOptions();
+      renderNewTagsPicker();
+      document.getElementById('count-total').textContent = '0';
+      document.getElementById('count-todo').textContent = '0';
+      document.getElementById('count-in-progress').textContent = '0';
+      document.getElementById('count-done').textContent = '0';
+    }
+
+    function updateAuthUI() {
+      const token = localStorage.getItem('access_token');
+      const user = localStorage.getItem('username');
+      const loggedOutNav = document.getElementById('auth-logged-out');
+      const loggedInNav = document.getElementById('auth-logged-in');
+      const userBadge = document.getElementById('nav-user-badge');
+
+      if (token && user) {
+        loggedOutNav.style.display = 'none';
+        loggedInNav.style.display = 'flex';
+        userBadge.textContent = `👤 ${user}`;
+      } else {
+        loggedOutNav.style.display = 'flex';
+        loggedInNav.style.display = 'none';
+      }
+    }
+
+    async function fetchProjects() {
+      if (!localStorage.getItem('access_token')) return;
+      try {
+        const res = await authFetch(API_PROJECTS);
+        if (!res.ok) return;
+        const data = await res.json();
+        cachedProjects = Array.isArray(data) ? data : (data.results || []);
+        renderProjectOptions();
+      } catch (err) {
+        console.error('Error fetching projects:', err);
+      }
+    }
+
+    function renderProjectOptions(selectedId = null) {
+      const newSelect = document.getElementById('new-project');
+      const editSelect = document.getElementById('edit-project');
+      const optionsHtml = '<option value="">-- No Project --</option>' +
+        cachedProjects.map(p => `<option value="${p.id}">${escape(p.name)}</option>`).join('');
+
+      if (newSelect) {
+        const curVal = newSelect.value;
+        newSelect.innerHTML = optionsHtml;
+        if (curVal) newSelect.value = curVal;
+      }
+      if (editSelect) {
+        editSelect.innerHTML = optionsHtml;
+        if (selectedId !== null && selectedId !== undefined) {
+          editSelect.value = selectedId || '';
+        }
+      }
+    }
+
+    async function promptNewProject() {
+      if (!localStorage.getItem('access_token')) {
+        openLoginModal();
+        return;
+      }
+      const name = prompt('Enter new project name:');
+      if (!name || !name.trim()) return;
+      const desc = prompt('Enter project description (optional):') || '';
+
+      try {
+        const res = await authFetch(API_PROJECTS, {
+          method: 'POST',
+          body: JSON.stringify({ name: name.trim(), description: desc.trim() })
+        });
+        if (res.ok) {
+          const newProj = await res.json();
+          await fetchProjects();
+          const newSelect = document.getElementById('new-project');
+          if (newSelect) newSelect.value = newProj.id;
+        } else {
+          alert('Could not create project. Check server console.');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function fetchTags() {
+      if (!localStorage.getItem('access_token')) return;
+      try {
+        const res = await authFetch(API_TAGS);
+        if (!res.ok) return;
+        const data = await res.json();
+        cachedTags = Array.isArray(data) ? data : (data.results || []);
+        renderNewTagsPicker();
+        renderEditTagsPicker();
+      } catch (err) {
+        console.error('Error fetching tags:', err);
+      }
+    }
+
+    function renderNewTagsPicker() {
+      const container = document.getElementById('new-tags-container');
+      if (!container) return;
+      if (cachedTags.length === 0) {
+        container.innerHTML = '<span style="font-size: 0.75rem; color: var(--text-muted);">No tags available</span>';
+        return;
+      }
+      container.innerHTML = cachedTags.map(tag => {
+        const isSelected = selectedNewTags.has(tag.id);
+        return `<span class="tag-chip ${isSelected ? 'active' : ''}" onclick="toggleNewTag(${tag.id})">#${escape(tag.name)}</span>`;
+      }).join('');
+    }
+
+    function toggleNewTag(tagId) {
+      if (selectedNewTags.has(tagId)) {
+        selectedNewTags.delete(tagId);
+      } else {
+        selectedNewTags.add(tagId);
+      }
+      renderNewTagsPicker();
+    }
+
+    function renderEditTagsPicker() {
+      const container = document.getElementById('edit-tags-container');
+      if (!container) return;
+      if (cachedTags.length === 0) {
+        container.innerHTML = '<span style="font-size: 0.75rem; color: var(--text-muted);">No tags available</span>';
+        return;
+      }
+      container.innerHTML = cachedTags.map(tag => {
+        const isSelected = selectedEditTags.has(tag.id);
+        return `<span class="tag-chip ${isSelected ? 'active' : ''}" onclick="toggleEditTag(${tag.id})">#${escape(tag.name)}</span>`;
+      }).join('');
+    }
+
+    function toggleEditTag(tagId) {
+      if (selectedEditTags.has(tagId)) {
+        selectedEditTags.delete(tagId);
+      } else {
+        selectedEditTags.add(tagId);
+      }
+      renderEditTagsPicker();
+    }
+
+    async function promptNewTag() {
+      if (!localStorage.getItem('access_token')) {
+        openLoginModal();
+        return;
+      }
+      const name = prompt('Enter new tag name (e.g. devops):');
+      if (!name || !name.trim()) return;
+      const cleanName = name.trim().toLowerCase().replace(/^#/, '');
+
+      try {
+        const res = await authFetch(API_TAGS, {
+          method: 'POST',
+          body: JSON.stringify({ name: cleanName })
+        });
+        if (res.ok) {
+          const newTag = await res.json();
+          selectedNewTags.add(newTag.id);
+          await fetchTags();
+        } else {
+          alert('Could not create tag (it might already exist).');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     async function fetchTasks() {
+      if (!localStorage.getItem('access_token')) {
+        renderList([]);
+        return;
+      }
+
       let url = `${API_BASE}?ordering=-created_at`;
       if (activeStatus) url += `&status=${activeStatus}`;
       if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
 
       try {
-        const res = await fetch(url);
+        const res = await authFetch(url);
+        if (!res.ok) return;
         const data = await res.json();
         const tasks = data.results || [];
         cachedTasks = tasks;
@@ -630,18 +1174,40 @@
     }
 
     async function updateCounters() {
+      if (!localStorage.getItem('access_token')) {
+        document.getElementById('count-total').textContent = '0';
+        document.getElementById('count-todo').textContent = '0';
+        document.getElementById('count-in-progress').textContent = '0';
+        document.getElementById('count-done').textContent = '0';
+        return;
+      }
+
       try {
-        const res = await fetch(`${API_BASE}metrics/`);
+        const res = await authFetch(`${API_BASE}metrics/`);
+        if (!res.ok) return;
         const m = await res.json();
         document.getElementById('count-total').textContent = m.total ?? 0;
         document.getElementById('count-todo').textContent = m.todo ?? 0;
         document.getElementById('count-in-progress').textContent = m.in_progress ?? 0;
         document.getElementById('count-done').textContent = m.completed ?? 0;
-      } catch (e) {}
+      } catch (e) { }
     }
 
     function renderList(tasks) {
       const container = document.getElementById('task-list');
+
+      if (!localStorage.getItem('access_token')) {
+        container.innerHTML = `
+          <div class="empty">
+            <p style="margin-bottom: 12px; color: var(--text-muted);">Please sign in or create an account to view and manage tasks.</p>
+            <div style="display: flex; gap: 8px; justify-content: center;">
+              <button type="button" class="btn-primary" onclick="openAuthModal('login')" style="font-size: 0.85rem; padding: 6px 16px; cursor: pointer;">🔑 Sign In</button>
+              <button type="button" class="btn-secondary" onclick="openAuthModal('register')" style="font-size: 0.85rem; padding: 6px 16px; cursor: pointer;">✨ Sign Up</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
       if (tasks.length === 0) {
         container.innerHTML = `
@@ -668,9 +1234,16 @@
                 <div class="task-heading">
                   <span class="task-id">#${task.id}</span>
                   <span class="task-title">${escape(task.title)}</span>
+                  ${task.project_name ? `<span class="project-badge">📁 ${escape(task.project_name)}</span>` : ''}
                 </div>
                 ${task.description ? `<p class="task-desc">${escape(task.description)}</p>` : ''}
+                ${(task.tag_details && task.tag_details.length > 0) ? `
+                  <div class="tags-wrapper" style="margin-top: 5px;">
+                    ${task.tag_details.map(t => `<span class="tag-badge">#${escape(t.name)}</span>`).join('')}
+                  </div>
+                ` : ''}
                 <div class="task-meta">
+                  ${task.owner ? `<span>👤 Owner: <strong>${escape(task.owner)}</strong></span>` : ''}
                   ${task.due_date ? `<span>📅 Due: ${task.due_date}</span>` : ''}
                   <span>Created: ${new Date(task.created_at).toLocaleDateString()}</span>
                 </div>
@@ -696,24 +1269,33 @@
 
     async function createTask(e) {
       e.preventDefault();
+      if (!localStorage.getItem('access_token')) {
+        openLoginModal();
+        return;
+      }
+
       const title = document.getElementById('new-title').value.trim();
       const desc = document.getElementById('new-desc').value.trim();
       const status = document.getElementById('new-status').value;
       const priority = document.getElementById('new-priority').value;
       const dueDate = document.getElementById('new-due-date').value || null;
+      const projVal = document.getElementById('new-project').value;
+      const projectId = projVal ? parseInt(projVal, 10) : null;
+      const tagIds = Array.from(selectedNewTags);
 
       if (!title) return;
 
       try {
-        const res = await fetch(API_BASE, {
+        const res = await authFetch(API_BASE, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             title: title,
             description: desc,
             status: status,
             priority: priority,
-            due_date: dueDate
+            due_date: dueDate,
+            project: projectId,
+            tags: tagIds
           })
         });
 
@@ -721,6 +1303,9 @@
           document.getElementById('new-title').value = '';
           document.getElementById('new-desc').value = '';
           document.getElementById('new-due-date').value = '';
+          document.getElementById('new-project').value = '';
+          selectedNewTags.clear();
+          renderNewTagsPicker();
 
           if (activeStatus && activeStatus !== status) {
             const matchingTab = document.querySelector(`.tab[data-status="${status}"]`);
@@ -745,9 +1330,8 @@
 
     async function patchTask(id, bodyObj) {
       try {
-        const res = await fetch(`${API_BASE}${id}/`, {
+        const res = await authFetch(`${API_BASE}${id}/`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(bodyObj)
         });
         if (res.ok) fetchTasks();
@@ -759,7 +1343,7 @@
     async function deleteTask(id) {
       if (!confirm(`Delete task #${id}?`)) return;
       try {
-        const res = await fetch(`${API_BASE}${id}/`, { method: 'DELETE' });
+        const res = await authFetch(`${API_BASE}${id}/`, { method: 'DELETE' });
         if (res.ok) fetchTasks();
       } catch (e) {
         console.error(e);
@@ -778,6 +1362,11 @@
       document.getElementById('edit-priority').value = task.priority;
       document.getElementById('edit-due-date').value = task.due_date || '';
 
+      renderProjectOptions(task.project);
+
+      selectedEditTags = new Set(task.tags || []);
+      renderEditTagsPicker();
+
       document.getElementById('edit-modal').classList.add('open');
     }
 
@@ -788,18 +1377,20 @@
     async function saveEdit(e) {
       e.preventDefault();
       const id = document.getElementById('edit-id').value;
+      const projVal = document.getElementById('edit-project').value;
       const body = {
         title: document.getElementById('edit-title').value.trim(),
         description: document.getElementById('edit-desc').value.trim(),
         status: document.getElementById('edit-status').value,
         priority: document.getElementById('edit-priority').value,
-        due_date: document.getElementById('edit-due-date').value || null
+        due_date: document.getElementById('edit-due-date').value || null,
+        project: projVal ? parseInt(projVal, 10) : null,
+        tags: Array.from(selectedEditTags)
       };
 
       try {
-        const res = await fetch(`${API_BASE}${id}/`, {
+        const res = await authFetch(`${API_BASE}${id}/`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
         if (res.ok) {
@@ -828,10 +1419,11 @@
 
     function escape(str) {
       if (!str) return '';
-      return str.replace(/[&<>'"]/g, 
+      return str.replace(/[&<>'"]/g,
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
       );
     }
   </script>
 </body>
+
 </html>
