@@ -27,8 +27,8 @@ class RequestLoggingMiddleware:
         )
 
         if duration_ms > 500:
-            print(f"[SLOW REQUEST] {log_message}")
+            logger.warning(f"[SLOW REQUEST] {log_message}")
         else:
-            print(f"[REQUEST] {log_message}")
+            logger.info(f"[REQUEST] {log_message}")
 
         return response
