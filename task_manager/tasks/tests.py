@@ -70,6 +70,18 @@ class TaskAPITestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['total'], 1)
 
+    def test_shared_and_user_scoped_task_metrics(self):
+        other_user = User.objects.create_user(username='other_contrib', password='password123')
+        Task.objects.create(title="Other User Task", status=TaskStatus.IN_PROGRESS, owner=other_user)
+
+        # Shared board metrics (all tasks)
+        global_metrics = get_task_metrics()
+        self.assertEqual(global_metrics['total'], 2)
+
+        # User-scoped metrics
+        contrib_metrics = get_task_metrics(user=other_user)
+        self.assertEqual(contrib_metrics['total'], 1)
+
     def test_request_logging_middleware_header(self):
         response = self.client.get('/api/v1/tasks/')
         self.assertIn('X-Request-ID', response.headers)
@@ -118,8 +130,7 @@ class TaskAPITestCase(TestCase):
         other_user = User.objects.create_user(username="other_contributor", password="password123")
         self.client.force_authenticate(user=other_user)
 
-        # Trying to edit self.task1 which is owned by self.user
-        response = self.client.patch(f'/api/v1/tasks/{self.task1.id}/', {"title": "Hacked Title"}, format='json')
+        response = self.client.patch(f'/api/v1/tasks/{self.task1.id}/', {"title": "Updated Title"}, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_admin_can_edit_other_user_task(self):
@@ -128,8 +139,49 @@ class TaskAPITestCase(TestCase):
         admin_user.groups.add(admin_group)
 
         self.client.force_authenticate(user=admin_user)
-        # Admin can edit self.task1 even though they are not the owner
         response = self.client.patch(f'/api/v1/tasks/{self.task1.id}/', {"title": "Admin Updated Title"}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         self.task1.refresh_from_db()
         self.assertEqual(self.task1.title, "Admin Updated Title")
+
+    def test_contributor_cannot_delete_own_task(self):
+        # Even the task owner (Contributor) cannot delete their own task
+        response = self.client.delete(f'/api/v1/tasks/{self.task1.id}/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Task.objects.filter(id=self.task1.id).exists())
+
+    def test_admin_can_delete_any_task(self):
+        admin_user = User.objects.create_user(username="super_admin", password="password123")
+        admin_group, _ = Group.objects.get_or_create(name="Admin")
+        admin_user.groups.add(admin_group)
+
+        self.client.force_authenticate(user=admin_user)
+        response = self.client.delete(f'/api/v1/tasks/{self.task1.id}/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Task.objects.filter(id=self.task1.id).exists())
+
+    def test_registration_auto_assigns_contributor_group(self):
+        self.client.force_authenticate(user=None)
+        payload = {
+            "username": "auto_contrib",
+            "email": "auto@example.com",
+            "password": "Password123!"
+        }
+        response = self.client.post('/api/v1/auth/register/', payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_user = User.objects.get(username="auto_contrib")
+        self.assertTrue(new_user.groups.filter(name="Contributor").exists())
+
+    def test_login_returns_role_in_response(self):
+        self.client.force_authenticate(user=None)
+        payload = {
+            "username": "testuser",
+            "password": "password123"
+        }
+        response = self.client.post('/api/v1/auth/login/', payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('user', response.data)
+        self.assertEqual(response.data['user']['username'], "testuser")
+        self.assertEqual(response.data['user']['role'], "Contributor")
+

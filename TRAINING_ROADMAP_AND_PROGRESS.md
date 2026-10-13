@@ -151,21 +151,22 @@
 
 #### Day 14 — Authentication & Authorization (CURRENT ACTIVE MILESTONE)
 - [x] `djangorestframework-simplejwt` installed in environment.
-- [ ] **JWT Configuration**: Register `JWTAuthentication` and token settings in `settings.py`.
-- [ ] **Auth Endpoints**:
-  - `POST /api/v1/auth/token/` (Login $\rightarrow$ returns `access` and `refresh` tokens).
-  - `POST /api/v1/auth/token/refresh/` (New access token via refresh token).
-- [ ] **Task Ownership**:
-  - Add `created_by` / `owner` (`ForeignKey(User, ...)`).
-  - Add `assigned_to` (`ForeignKey(User, null=True, ...)`).
+- [x] **JWT Configuration**: Registered `JWTAuthentication` and token settings in `settings.py`.
+- [x] **Auth Endpoints**:
+  - `POST /api/v1/auth/login/` (Login $\rightarrow$ returns `access` and `refresh` tokens).
+  - `POST /api/v1/auth/refresh/` (New access token via refresh token).
+  - `POST /api/v1/auth/register/` (Public user sign-up).
+- [x] **Task Ownership**:
+  - Added `owner` (`ForeignKey(User, ...)`).
+  - Added `assigned_to` (`ForeignKey(User, null=True, ...)`).
   - Auto-assign `request.user` on task creation (`perform_create`).
 - [ ] **Role-Based Access Control (RBAC)**:
-  - `Viewer` $\rightarrow$ Read-only access (`GET`).
-  - `Contributor` $\rightarrow$ Create and update own tasks.
-  - `Admin` $\rightarrow$ Full management access across all resources.
-- [ ] **Object-Level Permissions**: Custom `IsOwnerOrReadOnly` / `IsOwnerOrAdmin` permission class.
-- [ ] **Security Verification**: Testing `401 Unauthorized` vs `403 Forbidden` response boundaries.
-- ⭐ **Senior Best Practice**: Embedding custom claims (`role`, `email`) in JWT payload to prevent DB queries on every authenticated request.
+  - `Viewer` $\rightarrow$ Read-only access (`GET` only).
+  - `Contributor` $\rightarrow$ Create and update own tasks (**cannot delete tasks**).
+  - `Admin` $\rightarrow$ Full management access across all resources (including `DELETE`).
+- [x] **Object-Level Permissions**: Custom `IsOwnerOrReadOnly` / `TaskRolePermission` permission class.
+- [x] **Security Verification**: Testing `401 Unauthorized` vs `403 Forbidden` response boundaries.
+- ⭐ **Senior Best Practice**: Automated role seeding command (`setup_roles`) creating groups and test accounts.
 
 #### Day 15 — API Security + Documentation + Middleware Review
 - [ ] **CORS Configuration**: Install and configure `django-cors-headers` for frontend origins.
@@ -173,5 +174,47 @@
   - `AnonRateThrottle` (10 req/min for unauthenticated requests).
   - `UserRateThrottle` (60 req/min for authenticated requests).
 - [ ] **Security HTTP Status Verification**: Verifying `400`, `401`, `403`, `404`, `405`, and `429 Too Many Requests`.
-- [ ] **Swagger & Postman**: Export finalized OpenAPI 3.0 schema and Postman test collection.
+- [x] **Swagger & OpenAPI**: Module-wise categorized Swagger UI with Admin Panel quick link.
+- [ ] **Postman Collection**: Export finalized Postman test collection.
 - ⭐ **Senior Best Practice**: Automated security tests asserting throttling kicks in after burst limit.
+
+---
+
+### 🌐 Week 5+: Production Engineering, Distributed Systems & DevOps
+
+#### Day 16 — Testing & Quality Engineering
+- [ ] Unit testing, integration testing, and API testing.
+- [ ] `pytest` + Django `TestCase` + DRF `APIClient`.
+- [ ] Test fixtures, database mocking, and positive/negative test suites.
+- [ ] Comprehensive test coverage for CRUD + validation + authentication + permissions.
+- ⭐ **Senior Best Practice**: Regression testing asserting query count boundaries (`assertNumQueries`).
+
+#### Day 17 — Performance & Scalability
+- [ ] Slow query analysis, `EXPLAIN` query plans, and index benchmarking.
+- [ ] Advanced N+1 detection and resolution.
+- [ ] Caching strategies with Redis: API response caching and query caching.
+- [ ] Connection pooling and connection lifetime tuning (`CONN_MAX_AGE`).
+- [ ] Pagination tuning and stateless API architecture behind Nginx / AWS ALB with multiple instances.
+- ⭐ **Senior Best Practice**: Redis Cache-Aside pattern with TTL and cache invalidation hooks.
+
+#### Day 18 — Async & Distributed Backend
+- [ ] Background job processing with Celery and Redis message broker.
+- [ ] Message queues, AWS SQS concepts, and distributed task execution.
+- [ ] Retry mechanisms, exponential backoff, and idempotent task design.
+- [ ] Dead Letter Queues (DLQ) and Circuit Breaker patterns for resilient third-party integrations.
+- ⭐ **Senior Best Practice**: Decoupled asynchronous email/report generation without blocking HTTP worker threads.
+
+#### Day 19 — Docker + Containerization + CI/CD
+- [ ] Dockerfile creation, multi-stage builds, and image optimization.
+- [ ] `docker-compose.yml` orchestrating Django + PostgreSQL + Redis.
+- [ ] Container volumes, networking, and environment variable isolation.
+- [ ] GitLab CI/CD / GitHub Actions pipeline: Lint $\rightarrow$ Test $\rightarrow$ Quality Gate $\rightarrow$ Docker Build & Registry push.
+- ⭐ **Senior Best Practice**: Non-root container security execution and health checks in Docker Compose.
+
+#### Day 20 — Production Architecture + Final Challenge
+- [ ] Production architecture review: Monitoring, structured logging, health checks (`/healthz` readiness & liveness).
+- [ ] Security hardening, zero-downtime deployment strategies, and rollback mechanisms.
+- [ ] AWS cloud architecture concepts (ECS/EKS, RDS, S3, CloudFront).
+- [ ] Final Challenge: Independent API design, implementation, testing, containerization, and review presentation.
+- ⭐ **Senior Best Practice**: 12-Factor App compliance audit and production readiness checklist.
+
