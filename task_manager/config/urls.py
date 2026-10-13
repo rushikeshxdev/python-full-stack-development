@@ -11,6 +11,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from drf_spectacular.utils import extend_schema
+from rest_framework.throttling import ScopedRateThrottle
 from tasks.views import RegisterView
 from tasks.serializers import CustomTokenObtainPairSerializer
 
@@ -18,6 +19,8 @@ from tasks.serializers import CustomTokenObtainPairSerializer
 @extend_schema(tags=['Authentication'], summary='Obtain JWT access & refresh token pair (Login)')
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'auth'
 
 
 
