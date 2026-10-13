@@ -160,7 +160,7 @@
   - Added `owner` (`ForeignKey(User, ...)`).
   - Added `assigned_to` (`ForeignKey(User, null=True, ...)`).
   - Auto-assign `request.user` on task creation (`perform_create`).
-- [ ] **Role-Based Access Control (RBAC)**:
+- [x] **Role-Based Access Control (RBAC)**:
   - `Viewer` $\rightarrow$ Read-only access (`GET` only).
   - `Contributor` $\rightarrow$ Create and update own tasks (**cannot delete tasks**).
   - `Admin` $\rightarrow$ Full management access across all resources (including `DELETE`).
@@ -168,15 +168,16 @@
 - [x] **Security Verification**: Testing `401 Unauthorized` vs `403 Forbidden` response boundaries.
 - ⭐ **Senior Best Practice**: Automated role seeding command (`setup_roles`) creating groups and test accounts.
 
-#### Day 15 — API Security + Documentation + Middleware Review
-- [ ] **CORS Configuration**: Install and configure `django-cors-headers` for frontend origins.
-- [ ] **API Throttling & Rate Limiting**:
-  - `AnonRateThrottle` (10 req/min for unauthenticated requests).
-  - `UserRateThrottle` (60 req/min for authenticated requests).
-- [ ] **Security HTTP Status Verification**: Verifying `400`, `401`, `403`, `404`, `405`, and `429 Too Many Requests`.
+#### Day 15 — API Security + Documentation + Middleware Review (COMPLETED)
+- [x] **CORS Configuration**: Installed and configured `django-cors-headers` for frontend origins (`localhost:3000`, `localhost:5173`).
+- [x] **API Throttling & Rate Limiting**:
+  - `AnonRateThrottle` (100 req/min for unauthenticated requests).
+  - `UserRateThrottle` (1000 req/min for authenticated requests).
+  - `ScopedRateThrottle` (`5/minute` on `/api/v1/auth/login/` for brute-force protection).
+- [x] **Security HTTP Status Verification**: Verifying `400`, `401`, `403`, `404`, `405`, and `429 Too Many Requests`.
 - [x] **Swagger & OpenAPI**: Module-wise categorized Swagger UI with Admin Panel quick link.
 - [ ] **Postman Collection**: Export finalized Postman test collection.
-- ⭐ **Senior Best Practice**: Automated security tests asserting throttling kicks in after burst limit.
+- ⭐ **Senior Best Practice**: Automated security tests asserting throttling kicks in with `429 Too Many Requests` after burst limit and CORS preflight returns trusted origins.
 
 ---
 

@@ -9,6 +9,8 @@ from .services import get_task_metrics
 
 class TaskAPITestCase(TestCase):
     def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
         self.client = APIClient()
         self.user = User.objects.create_user(username="testuser", password="password123")
         self.client.force_authenticate(user=self.user)
@@ -30,6 +32,10 @@ class TaskAPITestCase(TestCase):
             project=self.project
         )
         self.task1.tags.set([self.tag1])
+
+    def tearDown(self):
+        from django.core.cache import cache
+        cache.clear()
 
     def test_list_tasks_v1(self):
         response = self.client.get('/api/v1/tasks/')
@@ -184,4 +190,25 @@ class TaskAPITestCase(TestCase):
         self.assertIn('user', response.data)
         self.assertEqual(response.data['user']['username'], "testuser")
         self.assertEqual(response.data['user']['role'], "Contributor")
+
+    def test_cors_preflight_options_response(self):
+        response = self.client.options(
+            '/api/v1/tasks/',
+            HTTP_ORIGIN='http://localhost:3000',
+            HTTP_ACCESS_CONTROL_REQUEST_METHOD='GET'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), 'http://localhost:3000')
+
+    def test_login_rate_limiting_throttle(self):
+        from django.core.cache import cache
+        cache.clear()
+        self.client.force_authenticate(user=None)
+        payload = {"username": "testuser", "password": "password123"}
+
+        for _ in range(5):
+            self.client.post('/api/v1/auth/login/', payload, format='json')
+
+        response = self.client.post('/api/v1/auth/login/', payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
 
