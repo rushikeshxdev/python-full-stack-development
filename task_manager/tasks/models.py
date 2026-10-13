@@ -2,31 +2,30 @@ from django.db import models
 from .constants import TaskStatus, TaskPriority
 from django.contrib.auth.models import User
 
-# 1:N relationship with task
 class Project(models.Model):
-    name = models.CharField(max_length=150, help_text="Name of the project")
-    description = models.TextField(blank=True, default="", help_text="Description of the project")
-    owner = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='projects',
-        help_text="Owner of the project"
-    )
+    name = models.CharField(max_length=150)
+    description = models.TextField(blank=True, default="")
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     class Meta:
         ordering = ['-created_at']
+
     def __str__(self):
         return self.name
 
-# M:N relationship with task
+
 class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True, help_text="Tag name (e.g. backend, urgent)")
+    name = models.CharField(max_length=50, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         ordering = ['name']
+
     def __str__(self):
         return f"#{self.name}"
+
 
 
 class Task(models.Model):
@@ -64,23 +63,17 @@ class Task(models.Model):
         help_text="User assigned to execute the task"
     )
 
-    # new fields for project and tags
     project = models.ForeignKey(
         Project,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='tasks',
-        help_text="Project this task belongs to (1:N)"
+        related_name='tasks'
     )
-    tags = models.ManyToManyField(
-        Tag,
-        blank=True,
-        related_name='tasks',
-        help_text="Tags/Categories associated with this task (M:N)"
-    )
+    tags = models.ManyToManyField(Tag, blank=True, related_name='tasks')
 
     class Meta:
+
         ordering = ['-created_at']
         verbose_name = 'Task'
         verbose_name_plural = 'Tasks'

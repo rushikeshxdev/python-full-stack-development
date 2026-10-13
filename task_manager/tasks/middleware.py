@@ -26,9 +26,11 @@ class RequestLoggingMiddleware:
             f"Request-ID: {request_id}"
         )
 
+        # Flag slow requests taking longer than 500ms for latency monitoring
         if duration_ms > 500:
             logger.warning(f"[SLOW REQUEST] {log_message}")
         else:
             logger.info(f"[REQUEST] {log_message}")
+
 
         return response
