@@ -164,18 +164,46 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-        'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-        'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-        'ROTATE_REFRESH_TOKENS': True,
-        'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 # Swagger / OpenAPI Settings
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Task Manager API',
-    'DESCRIPTION': 'RESTful Task Management API with CRUD, Filtering, Search, and Pagination',
+    'DESCRIPTION': (
+        'Enterprise RESTful Task Management API with JWT Authentication, RBAC, and Performance Analytics.\n\n'
+        '🔗 **[Open Django Admin Panel](/admin/)** to manage database users, groups, and permissions directly.'
+    ),
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
+    'TAGS': [
+        {
+            'name': 'Authentication',
+            'description': 'User registration, JWT login, and token refresh endpoints.',
+        },
+        {
+            'name': 'Tasks',
+            'description': 'Task lifecycle management, assignments, dynamic filtering, search, and ordering.',
+        },
+        {
+            'name': 'Projects',
+            'description': 'Project workspace creation, team ownership, and task grouping.',
+        },
+        {
+            'name': 'Tags',
+            'description': 'Taxonomy labels for organizing and categorizing tasks.',
+        },
+        {
+            'name': 'Analytics & Metrics',
+            'description': 'Real-time task metrics, completion counts, and performance indicators.',
+        },
+    ],
 }
 
 # Logging Configuration
