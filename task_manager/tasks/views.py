@@ -21,8 +21,14 @@ from .serializers import (
 from .services import get_task_metrics
 
 
+class OwnerCreateMixin:
+    """Reusable mixin that automatically sets the logged-in user as the resource owner."""
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
 @extend_schema(tags=['Tasks'])
-class TaskListCreateView(generics.ListCreateAPIView):
+class TaskListCreateView(OwnerCreateMixin, generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated, TaskRolePermission]
@@ -30,9 +36,6 @@ class TaskListCreateView(generics.ListCreateAPIView):
     filterset_fields = ['status', 'priority']
     search_fields = ['title', 'description']
     ordering_fields = ['created_at', 'due_date', 'priority', 'status']
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
 
     def get_queryset(self):
         user = self.request.user
@@ -75,7 +78,7 @@ class RegisterView(generics.CreateAPIView):
 
 
 @extend_schema(tags=['Projects'])
-class ProjectListCreateView(generics.ListCreateAPIView):
+class ProjectListCreateView(OwnerCreateMixin, generics.ListCreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -84,11 +87,8 @@ class ProjectListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
-            return Project.objects.all()
+            return Project.objects.select_related('owner')
         return Project.objects.none()
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
 
 
 @extend_schema(tags=['Projects'])
@@ -100,7 +100,7 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
-            return Project.objects.all()
+            return Project.objects.select_related('owner')
         return Project.objects.none()
 
 

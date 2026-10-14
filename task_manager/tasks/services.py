@@ -8,7 +8,7 @@ from .constants import TaskStatus, TaskPriority
 def get_task_metrics(user=None):
     queryset = Task.objects.all()
     if user:
-        queryset = queryset.filter(Q(owner=user) | Q(assigned_to=user))
+        queryset = queryset.for_user(user)
 
     today = date.today()
     # Single-pass aggregation using conditional counts to avoid multiple queries
@@ -23,10 +23,7 @@ def get_task_metrics(user=None):
 
 
 def get_overdue_tasks():
-    today = date.today()
-    return Task.objects.filter(
-        due_date__lt=today
-    ).exclude(status=TaskStatus.DONE)
+    return Task.objects.overdue()
 
 
 def mark_task_as_done(task_id: int) -> Task:

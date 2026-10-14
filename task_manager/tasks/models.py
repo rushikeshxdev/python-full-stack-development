@@ -1,13 +1,20 @@
 from django.db import models
+from django.db.models import Q
+from django.utils import timezone
 from .constants import TaskStatus, TaskPriority
 from django.contrib.auth.models import User
 
-class Project(models.Model):
+class TimestampModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+class Project(TimestampModel):
     name = models.CharField(max_length=150)
     description = models.TextField(blank=True, default="")
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -26,9 +33,47 @@ class Tag(models.Model):
     def __str__(self):
         return f"#{self.name}"
 
+class TaskQuerySet(models.QuerySet):
+    def completed(self):
+        return self.filter(status=TaskStatus.DONE)
+
+    def in_progress(self):
+        return self.filter(status=TaskStatus.IN_PROGRESS)
+
+    def todo(self):
+        return self.filter(status=TaskStatus.TODO)
+    
+    def overdue(self):
+        return self.filter(due_date__lt=timezone.now().date()).exclude(status=TaskStatus.DONE)
+    
+    def high_priority(self):
+        return self.filter(priority=TaskPriority.HIGH)
+    
+    def medium_priority(self):
+        return self.filter(priority=TaskPriority.MEDIUM)
+    
+    def low_priority(self):
+        return self.filter(priority=TaskPriority.LOW)
+    
+    def for_user(self, user):
+        return self.filter(Q(owner=user) | Q(assigned_to=user))
+    
+    def with_project(self, project):
+        return self.filter(project=project)
+    
+    def with_tag(self, tag):
+        return self.filter(tags__name=tag)
+    
+    def search(self, query):
+        return self.filter(
+            Q(title__icontains=query) | 
+            Q(description__icontains=query)
+        )
 
 
-class Task(models.Model):
+class Task(TimestampModel):
+    objects = TaskQuerySet.as_manager()
+
     title = models.CharField(max_length=200, help_text="Title of the task")
     description = models.TextField(blank=True, default="", help_text="Detailed description of the task")
     status = models.CharField(
@@ -44,8 +89,6 @@ class Task(models.Model):
         help_text="Priority level"
     )
     due_date = models.DateField(null=True, blank=True, help_text="Optional completion deadline (YYYY-MM-DD)")
-    created_at = models.DateTimeField(auto_now_add=True, help_text="Timestamp when task was created")
-    updated_at = models.DateTimeField(auto_now=True, help_text="Timestamp when task was last updated")
 
     owner = models.ForeignKey(
         User,
