@@ -6,28 +6,25 @@ from ..serializers import ProjectSerializer
 from .base import OwnerCreateMixin
 
 
-@extend_schema(tags=['Projects'])
-class ProjectListCreateView(OwnerCreateMixin, generics.ListCreateAPIView):
+class BaseProjectView:
+    """Shared base configuration for Project endpoints."""
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            return Project.objects.select_related('owner')
+        return Project.objects.none()
+
+
+@extend_schema(tags=['Projects'])
+class ProjectListCreateView(OwnerCreateMixin, BaseProjectView, generics.ListCreateAPIView):
     pagination_class = None
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated:
-            return Project.objects.select_related('owner')
-        return Project.objects.none()
-
 
 @extend_schema(tags=['Projects'])
-class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated]
+class ProjectDetailView(BaseProjectView, generics.RetrieveUpdateDestroyAPIView):
+    pass
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated:
-            return Project.objects.select_related('owner')
-        return Project.objects.none()
