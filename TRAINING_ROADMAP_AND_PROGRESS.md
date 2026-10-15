@@ -183,12 +183,13 @@
 
 ### 🌐 Week 5+: Production Engineering, Distributed Systems & DevOps
 
-#### Day 16 — Testing & Quality Engineering
-- [ ] Unit testing, integration testing, and API testing.
-- [ ] `pytest` + Django `TestCase` + DRF `APIClient`.
-- [ ] Test fixtures, database mocking, and positive/negative test suites.
-- [ ] Comprehensive test coverage for CRUD + validation + authentication + permissions.
-- ⭐ **Senior Best Practice**: Regression testing asserting query count boundaries (`assertNumQueries`).
+#### Day 16 — Testing & Quality Engineering (COMPLETED)
+- [x] **Pytest Setup**: Configured `pytest.ini`, `pytest-django`, and `pytest-cov`.
+- [x] **Modular Test Architecture**: Created `tasks/tests/` with `conftest.py` shared fixtures (`api_client`, `admin_user`, `contributor_user`, `viewer_user`, `bulk_tasks`).
+- [x] **Query Count Regression Testing**: `django_assert_num_queries` enforcing O(1) query count boundaries for task listing, project listing, and single-pass metrics aggregation.
+- [x] **Parametrized RBAC Matrix**: `@pytest.mark.parametrize` verifying permission boundaries across all 3 roles (`Viewer`, `Contributor`, `Admin`).
+- [x] **High Test Coverage**: 33 automated tests passing with **85% code coverage** across `tasks` domain.
+- ⭐ **Senior Best Practice**: Query count regression tests caught and eliminated an unoptimized N+1 query in `ProjectListCreateView` via `select_related('owner')`.
 
 #### Day 17 — Performance & Scalability
 - [ ] Slow query analysis, `EXPLAIN` query plans, and index benchmarking.

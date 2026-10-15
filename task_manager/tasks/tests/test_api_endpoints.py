@@ -2,9 +2,9 @@ from django.test import TestCase
 from django.contrib.auth.models import User, Group
 from rest_framework.test import APIClient
 from rest_framework import status
-from .models import Task, Project, Tag
-from .constants import TaskStatus, TaskPriority
-from .services import get_task_metrics
+from tasks.models import Task, Project, Tag
+from tasks.constants import TaskStatus, TaskPriority
+from tasks.services import get_task_metrics
 
 
 class TaskAPITestCase(TestCase):
@@ -152,7 +152,6 @@ class TaskAPITestCase(TestCase):
         self.assertEqual(self.task1.title, "Admin Updated Title")
 
     def test_contributor_cannot_delete_own_task(self):
-        # Even the task owner (Contributor) cannot delete their own task
         response = self.client.delete(f'/api/v1/tasks/{self.task1.id}/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(Task.objects.filter(id=self.task1.id).exists())
@@ -211,4 +210,3 @@ class TaskAPITestCase(TestCase):
 
         response = self.client.post('/api/v1/auth/login/', payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
-
