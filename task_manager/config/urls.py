@@ -12,7 +12,7 @@ from rest_framework_simplejwt.views import (
 )
 from drf_spectacular.utils import extend_schema
 from rest_framework.throttling import ScopedRateThrottle
-from tasks.views import RegisterView
+from tasks.views import RegisterView, HealthCheckView
 from tasks.serializers import CustomTokenObtainPairSerializer
 
 
@@ -31,6 +31,8 @@ class RefreshView(TokenRefreshView):
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='index.html'), name='home'),
+    path('health/', HealthCheckView.as_view(), name='health-check'),
+    path('api/v1/health/', HealthCheckView.as_view(), name='api-health-check'),
     path('api/v1/auth/register/', RegisterView.as_view(), name='register'),
     path('api/v1/auth/login/', LoginView.as_view(), name='token_obtain_pair'),
     path('api/v1/auth/refresh/', RefreshView.as_view(), name='token_refresh'),
@@ -40,3 +42,4 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
+

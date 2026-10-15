@@ -11,6 +11,7 @@ from .project import (
 )
 from .auth import RegisterView
 from .analytics import TaskMetricsView, TaskPerformanceReportView
+from .health import HealthCheckView
 
 __all__ = [
     'OwnerCreateMixin',
@@ -23,5 +24,7 @@ __all__ = [
     'RegisterView',
     'TaskMetricsView',
     'TaskPerformanceReportView',
+    'HealthCheckView',
 ]
+
 

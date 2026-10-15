@@ -23,3 +23,12 @@ venv/
 .vscode/
 .idea/
 *.swp
+
+# Static files collected
+staticfiles/
+
+# Test coverage & pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
