@@ -1,7 +1,7 @@
 from .task import TaskSerializer, TagSerializer
 from .project import ProjectSerializer
 from .auth import RegisterSerializer, CustomTokenObtainPairSerializer
-from .analytics import TaskMetricsSerializer
+from .analytics import TaskMetricsSerializer, TaskPerformanceReportSerializer
 
 __all__ = [
     'TagSerializer',
@@ -10,4 +10,6 @@ __all__ = [
     'RegisterSerializer',
     'CustomTokenObtainPairSerializer',
     'TaskMetricsSerializer',
+    'TaskPerformanceReportSerializer',
 ]
+

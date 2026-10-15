@@ -10,7 +10,7 @@ from .project import (
     ProjectDetailView,
 )
 from .auth import RegisterView
-from .analytics import TaskMetricsView
+from .analytics import TaskMetricsView, TaskPerformanceReportView
 
 __all__ = [
     'OwnerCreateMixin',
@@ -22,4 +22,6 @@ __all__ = [
     'ProjectDetailView',
     'RegisterView',
     'TaskMetricsView',
+    'TaskPerformanceReportView',
 ]
+
