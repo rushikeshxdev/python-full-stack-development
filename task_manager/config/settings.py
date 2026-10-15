@@ -29,8 +29,9 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-for-dev')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
 
-allowed_hosts_str = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost')
+allowed_hosts_str = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost,testserver')
 ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_str.split(',') if h.strip()]
+
 
 
 # Application definition
@@ -99,6 +100,20 @@ DATABASES = {
         'CONN_MAX_AGE': int(os.getenv('DB_CONN_MAX_AGE', 600)),
     }
 }
+
+# Caching Configuration (Redis + Fallback)
+# https://docs.djangoproject.com/en/6.1/topics/cache/
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'IGNORE_EXCEPTIONS': True,  # High Availability: Cache failures won't break the application
+        }
+    }
+}
+
 
 
 # Password validation
