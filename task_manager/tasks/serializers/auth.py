@@ -56,3 +56,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'role': role,
         }
         return data
+
+
+class UserSummarySerializer(serializers.ModelSerializer):
+    """Minimal user serializer for assignment dropdowns."""
+    class Meta:
+        model = User
+        fields = ['id', 'username']
+

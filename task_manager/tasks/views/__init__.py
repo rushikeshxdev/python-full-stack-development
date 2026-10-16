@@ -9,9 +9,10 @@ from .project import (
     ProjectListCreateView,
     ProjectDetailView,
 )
-from .auth import RegisterView
+from .auth import RegisterView, UserListView
 from .analytics import TaskMetricsView, TaskPerformanceReportView
 from .health import HealthCheckView
+from .notification import NotificationListView, NotificationMarkReadView
 
 __all__ = [
     'OwnerCreateMixin',
@@ -22,9 +23,14 @@ __all__ = [
     'ProjectListCreateView',
     'ProjectDetailView',
     'RegisterView',
+    'UserListView',
     'TaskMetricsView',
     'TaskPerformanceReportView',
     'HealthCheckView',
+    'NotificationListView',
+    'NotificationMarkReadView',
 ]
+
+
 
 

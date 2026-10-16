@@ -1,3 +1,4 @@
+import logging
 from rest_framework import generics, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -6,7 +7,10 @@ from drf_spectacular.utils import extend_schema
 from ..models import Task, Tag
 from ..serializers import TaskSerializer, TagSerializer
 from ..permissions import TaskRolePermission
+from ..tasks import send_task_notification_async
 from .base import OwnerCreateMixin
+
+logger = logging.getLogger(__name__)
 
 
 class BaseTaskView:
@@ -29,10 +33,54 @@ class TaskListCreateView(OwnerCreateMixin, BaseTaskView, generics.ListCreateAPIV
     search_fields = ['title', 'description']
     ordering_fields = ['created_at', 'due_date', 'priority', 'status']
 
+    def perform_create(self, serializer):
+        task = serializer.save(owner=self.request.user)
+        # Asynchronously dispatch notification if assigned to another user
+        if task.assigned_to and task.assigned_to != self.request.user:
+            try:
+                send_task_notification_async.delay(
+                    task.id,
+                    task.assigned_to.id,
+                    self.request.user.id,
+                    f"assigned you to task: '{task.title}'"
+                )
+            except Exception as exc:
+                logger.warning(f"Failed to enqueue Celery task notification: {exc}")
+
 
 @extend_schema(tags=['Tasks'])
 class TaskDetailView(BaseTaskView, generics.RetrieveUpdateDestroyAPIView):
-    pass
+    def perform_update(self, serializer):
+        prev_instance = self.get_object()
+        prev_assigned_to = prev_instance.assigned_to
+        prev_status = prev_instance.status
+
+        task = serializer.save()
+
+        # 1. New assignment notification
+        if task.assigned_to and task.assigned_to != self.request.user and prev_assigned_to != task.assigned_to:
+            try:
+                send_task_notification_async.delay(
+                    task.id,
+                    task.assigned_to.id,
+                    self.request.user.id,
+                    f"assigned you to task: '{task.title}'"
+                )
+            except Exception as exc:
+                logger.warning(f"Failed to enqueue Celery assignment notification: {exc}")
+
+        # 2. Status change to DONE notification
+        if prev_status != 'DONE' and task.status == 'DONE':
+            if task.owner and task.owner != self.request.user:
+                try:
+                    send_task_notification_async.delay(
+                        task.id,
+                        task.owner.id,
+                        self.request.user.id,
+                        f"marked task '{task.title}' as completed"
+                    )
+                except Exception as exc:
+                    logger.warning(f"Failed to enqueue Celery completion notification: {exc}")
 
 
 class BaseTagView:

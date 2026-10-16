@@ -95,24 +95,67 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', 'task_manager_db'),
         'USER': os.getenv('DB_USER', 'postgres'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'admin123'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),  # Use IPv4 loopback to prevent Windows IPv6 DNS lookup latency
         'PORT': os.getenv('DB_PORT', '5432'),
         'CONN_MAX_AGE': int(os.getenv('DB_CONN_MAX_AGE', 600)),
     }
 }
 
-# Caching Configuration (Redis + Fallback)
+# Caching Configuration (Redis with automatic local fallback)
 # https://docs.djangoproject.com/en/6.1/topics/cache/
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'IGNORE_EXCEPTIONS': True,  # High Availability: Cache failures won't break the application
+import socket
+
+def _is_redis_available(host='127.0.0.1', port=6379):
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(0.2)
+        result = sock.connect_ex((host, port))
+        sock.close()
+        return result == 0
+    except Exception:
+        return False
+
+if _is_redis_available():
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'IGNORE_EXCEPTIONS': True,
+                'SOCKET_CONNECT_TIMEOUT': 0.2,
+                'SOCKET_TIMEOUT': 0.2,
+            }
         }
     }
-}
+else:
+    # When Redis server is not running locally, use blazing-fast in-memory cache
+    # to eliminate the 4.0-second TCP connection timeout on throttling checks
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'task-manager-local-cache',
+        }
+    }
+
+
+# ==============================================================================
+# Celery Distributed Task Queue Settings
+# ==============================================================================
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30-minute hard execution limit
+
+# In local development / testing, execute tasks eagerly so notifications work without needing a separate Celery worker terminal
+CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER', 'True').lower() in ('true', '1')
+CELERY_TASK_EAGER_PROPAGATES = True
+
 
 
 

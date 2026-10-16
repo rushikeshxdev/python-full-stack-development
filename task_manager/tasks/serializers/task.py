@@ -12,7 +12,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
-    assigned_to = serializers.ReadOnlyField(source='assigned_to.username')
+    assigned_to_name = serializers.ReadOnlyField(source='assigned_to.username')
     project_name = serializers.ReadOnlyField(source='project.name')
     tag_details = TagSerializer(source='tags', many=True, read_only=True)
 
@@ -27,6 +27,7 @@ class TaskSerializer(serializers.ModelSerializer):
             'due_date',
             'owner',
             'assigned_to',
+            'assigned_to_name',
             'project',
             'project_name',
             'tags',
@@ -34,7 +35,7 @@ class TaskSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
-        read_only_fields = ['id', 'owner', 'assigned_to', 'project_name', 'tag_details', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'owner', 'assigned_to_name', 'project_name', 'tag_details', 'created_at', 'updated_at']
 
     def validate_title(self, value):
         cleaned = value.strip()

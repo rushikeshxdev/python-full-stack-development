@@ -129,3 +129,42 @@ class Task(TimestampModel):
 
     def __str__(self):
         return f"[{self.status}] {self.title}"
+
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        help_text="User who receives the notification"
+    )
+    actor = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='triggered_notifications',
+        help_text="User who triggered the notification"
+    )
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='notifications',
+        help_text="Related task"
+    )
+    verb = models.CharField(max_length=255, help_text="Action description (e.g. 'assigned you to task')")
+    is_read = models.BooleanField(default=False, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['recipient', 'is_read'], name='notif_recipient_read_idx'),
+        ]
+
+    def __str__(self):
+        actor_name = self.actor.username if self.actor else "System"
+        return f"To {self.recipient.username}: {actor_name} {self.verb}"
+
